@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Background Cleaner - Clean Dark Backgrounds from PDFs</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+      :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --navbar-bg: rgba(255, 255, 255, 0.95);
+      }
+
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        padding-top: 76px;
+      }
+
+      /* Navbar Styles */
+      .navbar-custom {
+        background: var(--navbar-bg);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        background: var(--primary-gradient);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+      }
+
+      .navbar-brand i {
+        background: var(--primary-gradient);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        margin-right: 0.5rem;
+      }
+
+      /* Main Content */
+      .main-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        margin: 2rem auto;
+        padding: 3rem;
+        max-width: 600px;
+        animation: slideIn 0.8s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .header-icon {
+        font-size: 4rem;
+        background: var(--primary-gradient);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      /* Info Section */
+      .info-section {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 3rem;
+        margin: 2rem auto;
+        max-width: 800px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .use-case-card {
+        background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 1rem 0;
+        border-left: 5px solid #667eea;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .use-case-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      }
+
+      .before-after {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .before-after .card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .before-card {
+        background: linear-gradient(145deg, #2c3e50, #34495e);
+        color: white;
+      }
+
+      .after-card {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        color: #333;
+      }
+
+      /* Upload Area Styles */
+      .drop-zone {
+        border: 3px dashed #ccc;
+        border-radius: 15px;
+        padding: 3rem 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: rgba(248, 249, 250, 0.8);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .drop-zone::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .drop-zone:hover::before {
+        left: 100%;
+      }
+
+      .drop-zone.drag-over {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+        transform: scale(1.02);
+      }
+
+      .drop-zone i {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+        display: block;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .upload-btn {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 50px;
+        padding: 12px 30px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .upload-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Loading and Result Styles */
+      .loading-container {
+        display: none;
+        text-align: center;
+        margin: 2rem 0;
+      }
+
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: #f0f0f0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 1rem 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--primary-gradient);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+      }
+
+      .result-container {
+        display: none;
+        text-align: center;
+        margin-top: 2rem;
+        padding: 2rem;
+        background: rgba(40, 167, 69, 0.1);
+        border-radius: 15px;
+        border: 2px solid rgba(40, 167, 69, 0.3);
+        animation: slideIn 0.5s ease-out;
+      }
+
+      .download-btn {
+        background: var(--success-gradient);
+        border: none;
+        border-radius: 50px;
+        padding: 12px 30px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        color: white;
+      }
+
+      .error-container {
+        display: none;
+        padding: 1rem;
+        background: rgba(220, 53, 69, 0.1);
+        border: 2px solid rgba(220, 53, 69, 0.3);
+        border-radius: 15px;
+        color: #dc3545;
+        margin-top: 1rem;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+      }
+
+      .feature-card {
+        text-align: center;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .feature-card i {
+        font-size: 2rem;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+      }
+
+      .loading-text {
+        color: #667eea;
+        font-weight: 500;
+        margin-top: 1rem;
+      }
+
+      .file-name {
+        font-weight: 600;
+        color: #495057;
+        margin-top: 1rem;
+        word-break: break-all;
+      }
+
+      /* Footer Styles */
+      .footer {
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 3rem 0 2rem;
+        margin-top: 4rem;
+      }
+
+      .footer h5 {
+        color: #fff;
+        margin-bottom: 1rem;
+      }
+
+      .footer p {
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+      }
+
+      .footer .text-center {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 2rem;
+        margin-top: 2rem;
+      }
+
+      .footer a {
+        color: #667eea;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        color: #764ba2;
+      }
+
+      @media (max-width: 768px) {
+        .main-container {
+          margin: 1rem;
+          padding: 2rem;
+        }
+
+        .before-after {
+          grid-template-columns: 1fr;
+        }
+
+        .info-section {
+          margin: 1rem;
+          padding: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top navbar-custom">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <i class="fas fa-magic"></i>PDF Background Cleaner
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#upload">Upload</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#features">Features</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Upload Section -->
+    <div class="container" id="upload">
+      <div class="row justify-content-center">
+        <div class="col-12">
+          <div class="main-container">
+            <div class="text-center">
+              <i class="fas fa-magic header-icon"></i>
+              <h1 class="mb-3">PDF Background Cleaner</h1>
+              <p class="text-muted mb-4">
+                Transform your PDFs by removing dark backgrounds and converting
+                them to clean white backgrounds
+              </p>
+            </div>
+
+            <div class="feature-grid">
+              <div class="feature-card">
+                <i class="fas fa-upload"></i>
+                <small>Drag & Drop</small>
+              </div>
+              <div class="feature-card">
+                <i class="fas fa-magic"></i>
+                <small>Auto Clean</small>
+              </div>
+              <div class="feature-card">
+                <i class="fas fa-download"></i>
+                <small>Instant Download</small>
+              </div>
+            </div>
+
+            <form id="uploadForm" enctype="multipart/form-data">
+              <div class="drop-zone" id="dropZone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h5>Drop your PDF here or click to browse</h5>
+                <p class="text-muted">Supports PDF files up to 50MB</p>
+                <input
+                  type="file"
+                  name="pdf"
+                  accept="application/pdf"
+                  required
+                  class="file-input"
+                  id="fileInput" />
+              </div>
+
+              <div class="file-name" id="fileName" style="display: none"></div>
+
+              <div class="text-center mt-4">
+                <button type="submit" class="upload-btn" id="uploadBtn">
+                  <i class="fas fa-magic me-2"></i>Clean PDF Background
+                </button>
+              </div>
+            </form>
+
+            <div class="loading-container" id="loadingContainer">
+              <div class="loading-spinner"></div>
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  id="progressFill"
+                  style="width: 0%"></div>
+              </div>
+              <div class="loading-text" id="loadingText">
+                Processing your PDF...
+              </div>
+            </div>
+
+            <div class="result-container" id="resultContainer">
+              <i
+                class="fas fa-check-circle text-success"
+                style="font-size: 3rem; margin-bottom: 1rem"></i>
+              <h4 class="text-success">PDF Cleaned Successfully!</h4>
+              <p class="text-muted">
+                Your PDF has been processed and is ready for download.
+              </p>
+              <a href="#" class="download-btn" id="downloadBtn">
+                <i class="fas fa-download me-2"></i>Download Cleaned PDF
+              </a>
+            </div>
+
+            <div class="error-container" id="errorContainer">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              <span id="errorMessage"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- About Section -->
+    <div class="container" id="about">
+      <div class="info-section">
+        <div class="text-center mb-5">
+          <h2 class="mb-3">Why Use PDF Background Cleaner?</h2>
+          <p class="lead">
+            Solve the common problem of dark background PDFs that are difficult
+            to read and print
+          </p>
+        </div>
+
+        <div class="use-case-card">
+          <div class="row align-items-center">
+            <div class="col-md-2 text-center">
+              <i class="fas fa-university fa-3x text-primary mb-3"></i>
+            </div>
+            <div class="col-md-10">
+              <h4>Institute Documents</h4>
+              <p class="mb-0">
+                Many educational institutes and organizations provide documents
+                with dark backgrounds, making them difficult to read and
+                consuming excessive ink when printed. Our tool converts these to
+                clean, readable PDFs with white backgrounds.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="use-case-card">
+          <div class="row align-items-center">
+            <div class="col-md-2 text-center">
+              <i class="fas fa-print fa-3x text-success mb-3"></i>
+            </div>
+            <div class="col-md-10">
+              <h4>Print-Friendly Documents</h4>
+              <p class="mb-0">
+                Save on printer ink and improve readability by converting dark
+                background PDFs to white background documents that are perfect
+                for printing and sharing.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="use-case-card">
+          <div class="row align-items-center">
+            <div class="col-md-2 text-center">
+              <i class="fas fa-eye fa-3x text-info mb-3"></i>
+            </div>
+            <div class="col-md-10">
+              <h4>Better Readability</h4>
+              <p class="mb-0">
+                Improve document readability, especially for people with visual
+                impairments or when viewing documents in bright environments.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container" id="features">
+      <div class="info-section">
+        <div class="text-center mb-5">
+          <h2 class="mb-3">Before & After Comparison</h2>
+          <p class="lead">See the transformation in action</p>
+        </div>
+
+        <div class="before-after">
+          <div class="card before-card">
+            <div class="card-body text-center p-4">
+              <i class="fas fa-file-pdf fa-4x mb-3"></i>
+              <h5>Before: Dark Background</h5>
+              <p>Difficult to read, high ink consumption, poor print quality</p>
+              <ul class="list-unstyled">
+                <li>
+                  <i class="fas fa-times text-danger me-2"></i>Hard to read
+                </li>
+                <li><i class="fas fa-times text-danger me-2"></i>Wastes ink</li>
+                <li>
+                  <i class="fas fa-times text-danger me-2"></i>Poor
+                  accessibility
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="card after-card">
+            <div class="card-body text-center p-4">
+              <i class="fas fa-file-pdf fa-4x mb-3 text-primary"></i>
+              <h5>After: Clean White Background</h5>
+              <p>
+                Crystal clear text, printer-friendly, professional appearance
+              </p>
+              <ul class="list-unstyled">
+                <li>
+                  <i class="fas fa-check text-success me-2"></i>Easy to read
+                </li>
+                <li><i class="fas fa-check text-success me-2"></i>Saves ink</li>
+                <li>
+                  <i class="fas fa-check text-success me-2"></i>Better
+                  accessibility
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <h4>How It Works</h4>
+          <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+              <div class="feature-card">
+                <i class="fas fa-upload"></i>
+                <h6 class="mt-2">1. Upload</h6>
+                <small>Drop your PDF file or click to browse</small>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="feature-card">
+                <i class="fas fa-cogs"></i>
+                <h6 class="mt-2">2. Process</h6>
+                <small>Our algorithm analyzes and cleans the background</small>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="feature-card">
+                <i class="fas fa-download"></i>
+                <h6 class="mt-2">3. Download</h6>
+                <small>Get your cleaned PDF instantly</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <h5><i class="fas fa-magic me-2"></i>PDF Background Cleaner</h5>
+            <p>
+              A simple, fast, and effective tool to clean dark backgrounds from
+              PDF documents. Perfect for students, professionals, and anyone
+              dealing with hard-to-read PDFs.
+            </p>
+          </div>
+          <div class="col-md-4 mb-4">
+            <h5>Features</h5>
+            <ul class="list-unstyled">
+              <li><i class="fas fa-check me-2"></i>Drag & Drop Upload</li>
+              <li><i class="fas fa-check me-2"></i>High-Quality Processing</li>
+              <li><i class="fas fa-check me-2"></i>Instant Download</li>
+              <li><i class="fas fa-check me-2"></i>Free to Use</li>
+            </ul>
+          </div>
+          <div class="col-md-4 mb-4">
+            <h5>Use Cases</h5>
+            <ul class="list-unstyled">
+              <li>
+                <i class="fas fa-graduation-cap me-2"></i>Educational Documents
+              </li>
+              <li><i class="fas fa-print me-2"></i>Print Optimization</li>
+              <li>
+                <i class="fas fa-accessibility me-2"></i>Accessibility
+                Improvement
+              </li>
+              <li><i class="fas fa-eye me-2"></i>Better Readability</li>
+            </ul>
+          </div>
+        </div>
+        <div class="text-center">
+          <p class="mb-0">Made with ❤️ by <strong>Anuj</strong></p>
+          <p class="mt-2">
+            <small>© 2025 PDF Background Cleaner. All rights reserved.</small>
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const dropZone = document.getElementById("dropZone");
+      const fileInput = document.getElementById("fileInput");
+      const uploadForm = document.getElementById("uploadForm");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const loadingContainer = document.getElementById("loadingContainer");
+      const resultContainer = document.getElementById("resultContainer");
+      const errorContainer = document.getElementById("errorContainer");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const fileName = document.getElementById("fileName");
+      const loadingText = document.getElementById("loadingText");
+      const progressFill = document.getElementById("progressFill");
+
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
+
+      // Drag and drop functionality
+      dropZone.addEventListener("click", () => fileInput.click());
+
+      dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("drag-over");
+      });
+
+      dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("drag-over");
+      });
+
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("drag-over");
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type === "application/pdf") {
+          fileInput.files = files;
+          showFileName(files[0].name);
+        } else {
+          showError("Please drop a valid PDF file.");
+        }
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) {
+          showFileName(e.target.files[0].name);
+        }
+      });
+
+      function showFileName(name) {
+        fileName.textContent = `Selected: ${name}`;
+        fileName.style.display = "block";
+      }
+
+      function showError(message) {
+        errorContainer.style.display = "block";
+        document.getElementById("errorMessage").textContent = message;
+        setTimeout(() => {
+          errorContainer.style.display = "none";
+        }, 5000);
+      }
+
+      function hideAllContainers() {
+        loadingContainer.style.display = "none";
+        resultContainer.style.display = "none";
+        errorContainer.style.display = "none";
+      }
+
+      function simulateProgress() {
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += Math.random() * 15;
+          if (progress > 90) progress = 90;
+          progressFill.style.width = progress + "%";
+
+          if (progress > 30 && progress < 60) {
+            loadingText.textContent =
+              "Converting PDF to high-quality images...";
+          } else if (progress >= 60) {
+            loadingText.textContent = "Cleaning backgrounds and optimizing...";
+          }
+        }, 200);
+
+        return interval;
+      }
+
+      uploadForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!fileInput.files[0]) {
+          showError("Please select a PDF file first.");
+          return;
+        }
+
+        hideAllContainers();
+        uploadBtn.disabled = true;
+        loadingContainer.style.display = "block";
+
+        const progressInterval = simulateProgress();
+
+        const formData = new FormData();
+        formData.append("pdf", fileInput.files[0]);
+
+        try {
+          const response = await fetch("/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const result = await response.json();
+
+          clearInterval(progressInterval);
+          progressFill.style.width = "100%";
+
+          if (result.success) {
+            setTimeout(() => {
+              loadingContainer.style.display = "none";
+              resultContainer.style.display = "block";
+              downloadBtn.href = `/download/${result.file_id}`;
+            }, 500);
+          } else {
+            loadingContainer.style.display = "none";
+            showError(
+              result.error || "An error occurred while processing your file."
+            );
+          }
+        } catch (error) {
+          clearInterval(progressInterval);
+          loadingContainer.style.display = "none";
+          showError(
+            "Network error. Please check your connection and try again."
+          );
+        } finally {
+          uploadBtn.disabled = false;
+        }
+      });
+
+      // Reset form when download is clicked
+      downloadBtn.addEventListener("click", () => {
+        setTimeout(() => {
+          uploadForm.reset();
+          fileName.style.display = "none";
+          hideAllContainers();
+          progressFill.style.width = "0%";
+          loadingText.textContent = "Processing your PDF...";
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

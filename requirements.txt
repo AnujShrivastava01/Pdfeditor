@@ -1,0 +1,6 @@
+Flask==2.3.3
+Werkzeug==2.3.7
+Pillow==10.0.0
+PyMuPDF==1.23.5
+numpy>=1.25.0
+scipy>=1.16.0
