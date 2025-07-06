@@ -2,8 +2,6 @@
 
 <div align="center">
 
-![PDF Cleaner Banner](https://via.placeholder.com/800x200/667eea/ffffff?text=PDF+Background+Cleaner)
-
 [![Python](https://img.shields.io/badge/Python-3.8+-3776ab?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-2.3.3-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
