@@ -6,9 +6,7 @@ import fitz  # PyMuPDF
 import io
 
 app = Flask(__name__)
-
-# For Vercel deployment, use /tmp directory for file uploads
-UPLOAD_FOLDER = '/tmp' if os.environ.get('VERCEL') else 'uploads'
+UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Set up logging
