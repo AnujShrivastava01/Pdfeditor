@@ -109,6 +109,89 @@ Before you begin, ensure you have the following installed:
 
 ---
 
+## 🚀 Deployment
+
+### 🌐 Deploy to Vercel
+
+<div align="center">
+
+```ascii
+┌─────────────────────────────────────────┐
+│  🚀 One-Click Vercel Deployment        │
+└─────────────────────────────────────────┘
+```
+
+</div>
+
+#### Quick Deploy with Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/pdf-cleaner)
+
+#### Manual Deployment Steps
+
+1. **Install Vercel CLI**
+
+   ```bash
+   npm install -g vercel
+   ```
+
+2. **Login to Vercel**
+
+   ```bash
+   vercel login
+   ```
+
+3. **Deploy the Application**
+
+   ```bash
+   vercel --prod
+   ```
+
+4. **Configure Environment Variables** (Optional)
+   ```bash
+   vercel env add MAX_FILE_SIZE
+   vercel env add PROCESSING_TIMEOUT
+   ```
+
+#### 📋 Deployment Checklist
+
+- ✅ `vercel.json` configuration file
+- ✅ `runtime.txt` for Python version
+- ✅ `.vercelignore` for excluded files
+- ✅ Modified Flask app for serverless compatibility
+- ✅ File upload handling for `/tmp` directory
+
+#### ⚠️ Important Notes for Vercel Deployment
+
+- 🕐 **Function Timeout**: Limited to 60 seconds for processing
+- 💾 **File Storage**: Files stored in `/tmp` (temporary, auto-cleanup)
+- 📐 **File Size**: Recommended max 10-20MB for better performance
+- 🔄 **Cold Starts**: First request may be slower due to function initialization
+
+### 🐳 Deploy with Docker (Alternative)
+
+Create a `Dockerfile`:
+
+```dockerfile
+FROM python:3.9-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+EXPOSE 5000
+
+CMD ["python", "app.py"]
+```
+
+```bash
+docker build -t pdf-cleaner .
+docker run -p 5000:5000 pdf-cleaner
+```
+
+---
+
 ## 🎮 Usage Guide
 
 <div align="center">

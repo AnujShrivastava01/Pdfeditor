@@ -6,7 +6,9 @@ import fitz  # PyMuPDF
 import io
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
+
+# For Vercel deployment, use /tmp directory for file uploads
+UPLOAD_FOLDER = '/tmp' if os.environ.get('VERCEL') else 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Set up logging
@@ -332,3 +334,6 @@ def download_file(file_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+# For Vercel deployment
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
